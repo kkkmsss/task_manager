@@ -1,0 +1,32 @@
+<h1><%= @task.new_record? ? '新規タスク作成' : 'タスク編集' %></h1>
+
+<%= form_with(model: @task, local: true) do |form| %>
+    <div>
+        <%= form.label :タスク名 %>
+        <%= form.text_field :title %>
+    </div>
+
+    <div>
+        <%= form.label :詳細 %>
+        <%= form.text_area :description %>
+    </div>
+
+    <div>
+        <%= form.label :締切日 %>
+        <%= form.date_field :due_date %>
+    </div>
+
+    <div>
+        <%= form.label :カテゴリ %>
+        <%= form.collection_select :category_id, @categories, :id, :name %>
+    </div>
+
+    <div>
+        <%= form.label :タスクが完了したらチェック！ %>
+        <%= form.check_box :completed %>
+    </div>
+
+    <%= form.submit %>
+<% end %>
+
+<%= link_to '戻る', tasks_path %>

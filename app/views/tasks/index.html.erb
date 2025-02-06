@@ -1,0 +1,89 @@
+<p id="notice"><%= notice %></p>
+<div class="index_h1">
+    <h1><span>Task</span>eru!</h1>
+</div>
+
+<div class="pro_all">
+    <h2>全体の進捗度</h2>
+    <p><%= number_to_percentage(@overall_progress, precision: 0) %></p>
+    <svg class="progress-circle" width="100" height="100" data-progress="<%= @overall_progress %>">
+        <circle class="background" cx="50" cy="50" r="40"></circle>
+        <circle class="progress" cx="50" cy="50" r="40"></circle>
+    </svg>
+</div>
+
+<div class="pro_contents">
+    <% @category_progress.each do |category_name, progress| %>
+        <div class="pro_content">
+            <h2><%= category_name %></h2>
+            <p>カテゴリー進捗度: <%= number_to_percentage(progress, precision: 0) %></p>
+            <svg class="progress-circle" width="100" height="100" data-progress="<%= progress %>">
+                <circle class="background" cx="50" cy="50" r="40"></circle>
+                <circle class="progress" cx="50" cy="50" r="40"></circle>
+            </svg>
+            <br>
+            <%= link_to 'タスクを表示', new_task_path %>
+        </div>
+    <% end %>
+</div>
+
+<script>
+    function updateProgressCircles() {
+        document.querySelectorAll(".progress-circle").forEach(circle => {
+            let progress = circle.dataset.progress;
+            let progressCircle = circle.querySelector(".progress");
+            let radius = progressCircle.r.baseVal.value;
+            let circumference = 2 * Math.PI * radius;
+            
+            progressCircle.style.strokeDasharray = circumference;
+            progressCircle.style.strokeDashoffset = circumference * (1 - progress / 100);
+        });
+    }
+
+    // Turbo Drive (TurboLinks) に対応
+    document.addEventListener("turbo:load", updateProgressCircles);
+    document.addEventListener("DOMContentLoaded", updateProgressCircles);
+</script>
+
+
+<style>
+.progress-circle {
+    transform: rotate(-90deg);
+}
+
+circle {
+    fill: none;
+    stroke-width: 8;
+}
+
+.background {
+    stroke: #ddd;
+}
+
+.progress {
+    stroke: #4CAF50;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s ease-in-out;
+}
+</style>
+
+<div class="index_h1">
+    <h1>カレンダー</h1>
+    <h2><%= link_to 'タスクを追加', new_task_path %></h2>
+</div>
+
+
+<% require 'ostruct' %>
+<%= month_calendar events: @tasks.map { |task| OpenStruct.new(id: task.id, start_time: task.due_date, title: task.title, completed: task.completed) } do |date, tasks| %>
+    <%= date.day %>
+    <% tasks.each do |task| %>
+        <div>
+            <%= link_to task.title, edit_task_path(task.id) %> -
+            <%= task.completed ? '完了' : '未完了' %>
+        </div>
+    <% end %>
+<% end %>
+<br>
+<br>
+<br>
+<br>
